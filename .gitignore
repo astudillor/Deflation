@@ -1,0 +1,8 @@
+*.swp
+*.pyc
+*.bak
+Deflation.egg-info/
+Deflation/__pycache__/
+__pycache__/
+matrices/
+venv/
