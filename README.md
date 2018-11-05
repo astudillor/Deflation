@@ -1,4 +1,4 @@
-# Deflation preconditioner
+# Deflation preconditioner for solving systems of linear equations
 
     References
     ----------
