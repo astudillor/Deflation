@@ -16,7 +16,15 @@ def vec2mat(x):
 
 
 class DeflationOperator(LinearOperator):
+    ''' Representation of the deflation operator
+        for symmetric matrices.
+    '''
+
     def __init__(self, A, Z):
+        '''
+        A: matrix to be deflated (sparse matrix | LinearOperator | ndarray)
+        Z: deflation space (ndarray)
+        '''
         super().__init__(shape=A.shape, dtype=np.result_type(A, Z))
         self.Z = vec2mat(Z)
         self.A = aslinearoperator(A)
@@ -30,12 +38,26 @@ class DeflationOperator(LinearOperator):
         return np.matmul(self.Z, self.Ei.dot(np.matmul(self.Z.T, x)))
 
     def _matvec(self, x):
+        '''
+        Performs the deflation multiplication Px
+        where P = I - AQ, Q = Z*inv(E)*Z.T, and
+        E = Z.T*A*Z
+        '''
         return x - self.AZ.dot(self.Ei.dot(self.Z.T.dot(x)))
 
     def project_back(self, b, x):
+        ''' Returns the solution of the original system using the solution
+            of the projected system.
+        '''
         return self.multQ(b) + self.multPT(x)
 
+    def toarray(self):
+        ''' Returns a dense ndarray representation of this operator.'''
+        return self.matmat(np.eye(self.shape[0]))
+
+
 class DeflatedOperator(LinearOperator):
+
     def __init__(self, A, Z):
         super().__init__(shape=A.shape, dtype=np.result_type(A, Z))
         self.P = DeflationOperator(A, Z)
@@ -45,6 +67,5 @@ class DeflatedOperator(LinearOperator):
         return self.P.matvec(self.A.matvec(x))
 
     def toarray(self):
-        """docstring for toarray"""
+        ''' Returns a dense ndarray representation of this operator.'''
         return self.matmat(np.eye(self.shape[0]))
-
