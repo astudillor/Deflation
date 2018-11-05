@@ -6,3 +6,5 @@ Deflation/__pycache__/
 __pycache__/
 matrices/
 venv/
+build/
+dist/

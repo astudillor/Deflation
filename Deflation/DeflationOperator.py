@@ -7,15 +7,21 @@ import numpy as np
 
 __all__ = ['DeflationOperator', 'DeflatedOperator']
 
+
+def vec2mat(x):
+    n = x.shape[0]
+    if x.shape == (n,):
+        return np.reshape(a=x, newshape=(n, 1))
+    return np.array(x)
+
+
 class DeflationOperator(LinearOperator):
     def __init__(self, A, Z):
         super().__init__(shape=A.shape, dtype=np.result_type(A, Z))
-        self.Z = Z
-        if Z.ndim == 1:
-            self.Z = np.reshape(a=Z, newshape=(A.shape[0], 1))
+        self.Z = vec2mat(Z)
         self.A = aslinearoperator(A)
-        self.Ei = np.linalg.inv(np.matmul(Z.T, self.A.matmat(self.Z)))
-        self.AZ = self.A.matmat(self.Z)
+        self.AZ = vec2mat(self.A.matmat(self.Z))
+        self.Ei = np.linalg.inv(np.matmul(Z.T, self.AZ))
 
     def multPT(self, x):
         return x - self.multQ(self.A.matvec(x))
